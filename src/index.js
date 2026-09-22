@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { choiceCriteria, choiceQuestion, evaluate, evaluationInput, model, noulQuestion, scoreQuestion, structuredValue } from "./typesafe.js";
+import { choiceCriteria, choiceQuestion, evaluate, evaluationInput, getConfiguration, listModels, model, noulQuestion, scoreQuestion, structuredValue } from "./typesafe.js";
 
 function toolResult(value) {
   return {
@@ -99,6 +99,26 @@ server.tool(
       return toolError(error.message);
     }
   },
+);
+
+server.tool(
+  "jev_models",
+  "List the TypeSafe models available to this API key. This requests model metadata and does not evaluate a Jev question.",
+  {},
+  async () => {
+    try {
+      return toolResult(await listModels());
+    } catch (error) {
+      return toolError(error.message);
+    }
+  },
+);
+
+server.tool(
+  "jev_doctor",
+  "Inspect local Jev configuration without contacting TypeSafe. Reports only whether a key is present and where it comes from, never the key itself.",
+  {},
+  async () => toolResult(await getConfiguration()),
 );
 
 await server.connect(new StdioServerTransport());
